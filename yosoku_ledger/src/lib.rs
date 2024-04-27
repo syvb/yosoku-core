@@ -6,7 +6,7 @@ pub struct Transaction {
     pub postings: Vec<Posting>,
     pub created_by: Account,
     pub status: TransactionStatus,
-    pub typ: TransactionType,
+    pub data: TransactionData,
     pub memo: String,
 }
 /// One part of a transaction.
@@ -23,6 +23,18 @@ pub enum TransactionStatus {
 /// Identifies an account.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Account(u64);
+const SYSTEM_ACCOUNT: Account = Account(0);
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum AccountData {
+    System,
+
+    // holds tokens
+    User,
+    Contract,
+
+    // token sources
+    BonusSource,
+}
 pub type TokenNumber = i64;
 /// Identifies a signed amount of a currency.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -32,13 +44,18 @@ pub enum Token {
     SiteCurrency,
 }
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum TransactionType {
+pub enum TransactionData {
+    AccountCreation(Account),
     Transfer,
 }
 
 /// A ledger is a queryable log of transactions.
 pub trait Ledger {
+    // mutations
     fn transact(&mut self, txn: Transaction);
+    fn create_account(&mut self, typ: AccountType, creator: Account) -> Account;
+
+    // queries
     fn account_balance(&self, account: Account, token: Token) -> TokenAmount;
 }
 
@@ -51,7 +68,15 @@ pub struct MemoryLedger {
 impl MemoryLedger {
     pub fn new() -> Self {
         Self {
-            txns: Vec::new(),
+            txns: vec![
+                Transaction {
+                    postings: vec![],
+                    created_by: SYSTEM_ACCOUNT,
+                    status: TransactionStatus::Finalised { time: 0 },
+                    typ: TransactionType::AccountCreation,
+                    memo: String::new(),
+                }
+            ],
             time: 0,
         }
     }
@@ -59,11 +84,14 @@ impl MemoryLedger {
     pub fn time(&self) -> u64 {
         self.time
     }
+    fn next_time(&mut self) -> u64 {
+        self.time += 1;
+        return self.time;
+    }
 }
 impl Ledger for MemoryLedger {
     fn transact(&mut self, mut txn: Transaction) {
-        self.time += 1;
-        txn.status = TransactionStatus::Finalised { time: self.time };
+        txn.status = TransactionStatus::Finalised { time: self.next_time() };
         self.txns.push(txn.clone());
     }
     fn account_balance(&self, account: Account, token: Token) -> TokenAmount {
@@ -81,5 +109,15 @@ impl Ledger for MemoryLedger {
                 })
                 .sum(),
         )
+    }
+    fn create_account(&mut self, typ: AccountType, creator: Account) -> Account {
+        let now = self.next_time();
+        self.transact(Transaction {
+            postings: Vec::new(),
+            created_by: creator,
+            status: TransactionStatus::Finalised { time: now },
+            typ: TransactionType::AccountCreation,
+            memo: String::new(),
+        });
     }
 }
