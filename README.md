@@ -60,4 +60,6 @@ Ledger
 
 `MemoryLedger` is the simplest ledger - it just[^ml-time] stores a list of transactions. Most queries on a `MemoryLedger` is slow - for example, `MemoryLedger::account_balance` has to look at every transaction in the ledger to find out which ones affect the provided account. `PostgresLedger` (coming soon!) is much more efficent, by using various indexes and caches to make commonly used queries faster. However, it always produces the same results as a memory ledger.
 
+Since all ledger implementations implement the same `Ledger` interface, user code doesn't need to care what ledger implementation is being used. You can use a `MemoryLedger` for local testing, a `SqliteLedger` in dev, and a `PostgresLedger` in production - they are indistinguishable from the perspective of user code.
+
 [^ml-time]: It also stores a time number (incremented on every transaction), so that transaction times are deterministic.
