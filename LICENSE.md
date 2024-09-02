@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 Manifold Markets, Inc.
+Copyright (c) 2022 Manifold Markets, Inc.\
 Copyright (c) 2024 syvb
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
