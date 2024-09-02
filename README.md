@@ -25,11 +25,35 @@ Ledger
     # Create market
     Creator: Account(1)
     Status: Finalized at Jan 1 2024 00:03
-    Data: AccountCreation(Account(2), Market("Who will win my Best Pony award?"))
+    Data: AccountCreation(Account(2), Contract("Will Twilight Sparkle win my Best Pony award?", ...))
     Postings:
       # initial subsidy
       Account(1): -20¤
       Account(2): +20¤
+  Transaction
+    # Bet 5¤ on YES
+    Creator: Account(1)
+    Status: Finalized at Jan 1 2024 00:06
+    Data: Bet(Account(2), Outcome::YES)
+    Postings:
+      Account(1): -6¤
+      # Pay 5¤ to contract
+      Account(2): +5¤
+      # Pay fee to system
+      SYSTEM_ACCOUNT: +1¤
+  # ... 115¤ of other bets ...
+  Transaction
+    # Resolve market
+    Creator: Account(1)
+    Status: Finalized at Jan 2 2024 00:06
+    Data: Resolve(Account(2), Outcome::YES)
+    Postings:
+      # Reduce market balance to zero
+      Account(2): -120¤
+      # Send payouts using market balance
+      Account(1): +10¤
+      Account(3):  +30¤
+      Account(4):  +80¤
 ```
 
 ### Ledger implementations
