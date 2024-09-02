@@ -1,6 +1,6 @@
 # Yosoku
 
-*Yosoku* is an append-only financial ledger, intended for use in financial applications such as prediction markets. Currently his is more of an idea than an actual implementation; the code in this repo is very minimal.
+*Yosoku* is an append-only financial ledger, intended for use in financial applications such as prediction markets. Currently this is more of an idea than an actual implementation; the code in this repo is very minimal.
 
 ## How it works
 
