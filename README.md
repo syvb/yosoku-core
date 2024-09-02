@@ -14,7 +14,7 @@ A ledger is a list of transactions. A transaction has a list of postings and som
 ```
 Ledger
   Transaction
-    # Create user 1 with 500 
+    # Create user 1 with 100¤ initial balance 
     Creator: SYSTEM_ACCOUNT
     Status: Finalized at Jan 1 2024 00:00
     Data: AccountCreation(Account(1), User)
